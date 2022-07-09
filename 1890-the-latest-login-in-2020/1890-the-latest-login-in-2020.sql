@@ -1,8 +1,16 @@
 # Write your MySQL query statement below
 
-SELECT
-    user_id,
-    MAX(time_stamp) AS last_stamp 
-FROM Logins
-WHERE YEAR(time_stamp) = 2020 
-GROUP BY user_id;
+with a as (
+select 
+    user_id, 
+    group_concat(year(time_stamp)) as years
+from Logins
+group by user_id
+having group_concat(year(time_stamp)) like '%2020%'
+)
+
+
+select user_id, max(time_stamp) as last_stamp          
+from Logins
+where user_id in (select user_id from a) and year(time_stamp) = '2020'
+group by user_id
